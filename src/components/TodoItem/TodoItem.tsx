@@ -27,6 +27,8 @@ export const TodoItem: React.FC<Props> = ({
   const handleEditTitleTodo = async () => {
     if (newTitle === title) {
       setShowEditId(null);
+
+      return;
     }
 
     if (newTitle.length === 0) {

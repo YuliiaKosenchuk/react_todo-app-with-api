@@ -60,7 +60,6 @@ export const App: React.FC = () => {
       addTodo(trimedTitle)
         .then(newTodo => {
           setTodos([...todos, newTodo]);
-          setTempTodo(null);
           setTitle('');
         })
         .catch(() => {
@@ -103,6 +102,12 @@ export const App: React.FC = () => {
   const handleClearComplete = () => {
     const completedTodos = todos.filter((todo: Todo) => todo.completed);
 
+    completedTodos.map((todo: Todo) => {
+      setSelectedTodosIds(prevTodosIds => {
+        return [...prevTodosIds, todo.id];
+      });
+    });
+
     const deletePromises = completedTodos.map((completedTodo: Todo) => {
       return deleteTodo(completedTodo.id);
     });
@@ -129,6 +134,9 @@ export const App: React.FC = () => {
       .catch(() => {
         setErrorMessage(ErrorMessage.deleteError);
         setTimeout(() => setErrorMessage(''), 3000);
+      })
+      .finally(() => {
+        setSelectedTodosIds([]);
       });
   };
 
