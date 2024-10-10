@@ -10,7 +10,7 @@ type Props = {
   deleteSelectTodo: (id: number) => void;
   isLoadingById: boolean;
   handleUpdateComplete: (todo: Todo) => void;
-  handleEditTitle: (title: string, todo: Todo) => void;
+  handleEditTitle: (title: string, todo: Todo) => Promise<boolean>;
 };
 
 export const TodoItem: React.FC<Props> = ({
@@ -21,22 +21,33 @@ export const TodoItem: React.FC<Props> = ({
   handleEditTitle,
 }) => {
   const { id, completed, title } = todo;
-  const [showEditInput, setShowEditInput] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
+  const [showEditId, setShowEditId] = useState<number | null>(null);
 
-  const handleEditTitleTodo = () => {
+  const handleEditTitleTodo = async () => {
+    if (newTitle === title) {
+      setShowEditId(null);
+    }
+
     if (newTitle.length === 0) {
       deleteSelectTodo(id);
-    } else if (showEditInput && newTitle.trim()) {
-      handleEditTitle(newTitle.trim(), todo);
-      setShowEditInput(false);
+    } else if (showEditId && newTitle.trim()) {
+      try {
+        const result = await handleEditTitle(newTitle.trim(), todo);
+
+        if (result) {
+          setShowEditId(null);
+        }
+      } catch (error) {
+        setShowEditId(id);
+      }
     }
   };
 
   const handleEscape = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       setNewTitle(title);
-      setShowEditInput(false);
+      setShowEditId(null);
     }
   };
 
@@ -54,7 +65,7 @@ export const TodoItem: React.FC<Props> = ({
           onChange={() => handleUpdateComplete(todo)}
         />
       </label>
-      {showEditInput ? (
+      {showEditId === id ? (
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -78,7 +89,7 @@ export const TodoItem: React.FC<Props> = ({
           <span
             data-cy="TodoTitle"
             className="todo__title"
-            onDoubleClick={() => setShowEditInput(true)}
+            onDoubleClick={() => setShowEditId(id)}
           >
             {newTitle.trim()}
           </span>

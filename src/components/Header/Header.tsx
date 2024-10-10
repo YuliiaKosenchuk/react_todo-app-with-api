@@ -7,7 +7,6 @@ type Props = {
   title: string;
   setTitle: (value: string) => void;
   todos: Todo[];
-  errorMessage: string;
   isLoading: boolean;
   handleAllChangeStatus: (todos: Todo[]) => void;
 };
@@ -17,7 +16,6 @@ export const Header: React.FC<Props> = ({
   title,
   setTitle,
   todos,
-  errorMessage,
   isLoading,
   handleAllChangeStatus,
 }) => {
@@ -27,7 +25,7 @@ export const Header: React.FC<Props> = ({
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isLoading, errorMessage, todos]);
+  }, [isLoading, todos]);
 
   const handleTitleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

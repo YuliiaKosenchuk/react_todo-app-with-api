@@ -9,7 +9,7 @@ type Props = {
   tempTodo?: Todo | null;
   handleUpdateComplete: (todo: Todo) => void;
   selectedTodosIds: number[];
-  handleEditTitle: (title: string, todo: Todo) => void;
+  handleEditTitle: (title: string, todo: Todo) => Promise<boolean>;
 };
 
 export const TodoList: React.FC<Props> = ({

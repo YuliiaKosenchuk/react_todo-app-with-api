@@ -224,27 +224,36 @@ export const App: React.FC = () => {
       });
   };
 
-  const handleEditTitle = (newTitle: string, currentTodo: Todo) => {
-    setSelectedTodosIds(prevTodosIds => {
-      return [...prevTodosIds, currentTodo.id];
-    });
-
-    editTodo({
-      ...currentTodo,
-      title: newTitle,
-    })
-      .then(res => {
-        setTodos(prevTodos =>
-          prevTodos.map((item: Todo) => (item.id === res.id ? res : item)),
-        );
-      })
-      .catch(() => {
-        setErrorMessage(ErrorMessage.updateError);
-        setTimeout(() => setErrorMessage(''), 3000);
-      })
-      .finally(() => {
-        setSelectedTodosIds([]);
+  const handleEditTitle = (
+    newTitle: string,
+    currentTodo: Todo,
+  ): Promise<boolean> => {
+    return new Promise(resolve => {
+      setSelectedTodosIds(prevTodosIds => {
+        return [...prevTodosIds, currentTodo.id];
       });
+
+      editTodo({
+        ...currentTodo,
+        title: newTitle,
+      })
+        .then(res => {
+          setTodos(prevTodos =>
+            prevTodos.map((item: Todo) => (item.id === res.id ? res : item)),
+          );
+
+          resolve(true);
+        })
+        .catch(() => {
+          setErrorMessage(ErrorMessage.updateError);
+          setTimeout(() => setErrorMessage(''), 3000);
+
+          resolve(false);
+        })
+        .finally(() => {
+          setSelectedTodosIds([]);
+        });
+    });
   };
 
   return (
@@ -257,7 +266,6 @@ export const App: React.FC = () => {
           title={title}
           setTitle={setTitle}
           todos={todos}
-          errorMessage={errorMessage}
           isLoading={isLoading}
           handleAllChangeStatus={handleAllChangeStatus}
         />
